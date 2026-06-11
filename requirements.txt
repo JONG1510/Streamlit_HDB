@@ -1,0 +1,8 @@
+# requirements.txt is for Streamlit sharing, which requires a requirements.txt file.
+# Apparently, Streamlit works faster with a requirements.txt file than with an environment.yml file, which is why we have both.
+# Otherwise an environment.yml file is sufficient for local development. 
+
+requests==2.31.0
+pandas==2.2.0
+pyarrow==15.0.0
+streamlit==1.32.0
