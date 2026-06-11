@@ -218,3 +218,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Ignore python system files
+__pycache__/
+*.pyc
+
+# Ignore secret credentials files
+.env
+secret_keys.json
+
+# Ignore temporary system metadata files
+*.Zone.Identifier
+.DS_Store

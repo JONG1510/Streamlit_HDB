@@ -6,20 +6,17 @@ from datetime import datetime
 # A simple way to see when the app was last rerun, which can be helpful for debugging and performance monitoring.
 print(f"🟢 Rerun at: {datetime.now()}")
 
-DATA_PATH = "data/resale_data.csv"
+DATA_PATH = "data/latest_hdb_resale_prices.parquet"
 
 #
 @st.cache_data
 def load_data(path):
     print(f"✨ Loading data at: {datetime.now()}")
-    df = pd.read_csv(path)
+    df = pd.read_parquet(path)
     df["month"] = pd.to_datetime(df["month"])
     return df
 
 df = load_data(DATA_PATH)
-
-#df=pd.read_csv(DATA_PATH) 
-# #--This is a duplicate of the load_data function, we can remove it after confirming that the caching works as expected.
 
 ### Phase 2: Setting up the Page and Main Canvas
 ##This layout section sets the structural boundaries of the browser page before any data visuals are rendered.
