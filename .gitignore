@@ -230,3 +230,6 @@ secret_keys.json
 # Ignore temporary system metadata files
 *.Zone.Identifier
 .DS_Store
+
+# Ignore machine-specific files
+machine_id_v4

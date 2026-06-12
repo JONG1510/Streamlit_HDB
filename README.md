@@ -1,8 +1,8 @@
-# 🇸🇬 Singapore HDB Resale Price Dashboard & Data Pipeline
+# Singapore HDB Resale Price Dashboard & Data Pipeline
 
-An automated, cloud-native data pipeline and interactive web dashboard built to track and analyze the latest public housing resale transactions in Singapore. 
+- An automated, cloud-native data pipeline and interactive web dashboard built to track and analyze the latest public housing resale transactions in Singapore. 
 
-This project completely automates the extraction of fresh monthly transaction data directly from the official government portal (`data.gov.sg`), packages it into a 
+- This project completely automates the extraction of fresh monthly transaction data directly from the official government portal (`data.gov.sg`), packages it into a 
 highly compressed, high-performance **Parquet** data format, 
 and updates a live web dashboard without any manual intervention.
 
@@ -63,11 +63,11 @@ The project relies on a clean, modern data engineering stack specified in requir
 The automated workflow inside .github/workflows/hdb_updater.yml is governed by a standard cloud timer expression:
 cron: '0 1 * * 5'
 
-0: Exact Minute (00)
+``` 0: Exact Minute (00) ```
 
-1: Exact Hour (1:00 AM UTC, which maps perfectly to 9:00 AM Singapore Time because Singapore is 8 hours ahead of universal time).
+``` 1: Exact Hour (1:00 AM UTC, which maps perfectly to 9:00 AM Singapore Time because Singapore is 8 hours ahead of universal time). ```
 
-* *: Runs every day of the month, every month of the year.
+``` * *: Runs every day of the month, every month of the year. ```
 
-5: Runs specifically on day 5 of the week (Friday).
+``` 5: Runs specifically on day 5 of the week (Friday). ```
 
