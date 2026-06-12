@@ -1,6 +1,7 @@
 # Singapore HDB Resale Price Dashboard & Data Pipeline
 
 - An automated, cloud-native data pipeline and interactive web dashboard built to track and analyze the latest public housing resale transactions in Singapore. 
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://your-app-link-here.streamlit.app)
 
 - This project completely automates the extraction of fresh monthly transaction data directly from the official government portal (`data.gov.sg`), packages it into a 
 highly compressed, high-performance **Parquet** data format, 
@@ -20,16 +21,11 @@ To keep the application fast and cost-effective, the pipeline splits data retrie
  [Live Streamlit App] 🔀 (Auto-Reloads) 🔀 [data/latest_hdb_resale_prices.parquet]
 
 ```
-
-- **Every Friday at 9:00 AM (SGT):** A GitHub Actions workflow wakes up automatically in the cloud.
-
-- **Data Extraction:** The workflow installs Python, executes get_hdb_data.py, completes a two-step handshake with the Data.gov.sg V2 API, identifies the newest monthly data slice, and downloads it.
-
-- **Storage Optimization:** The raw data is saved into the data/ folder as a compressed Parquet file (shrinking the file footprint from over 21MB down to under 5MB).
-
-- **Automated Commit:** The GitHub Bot automatically commits and pushes the updated data back into this repository.
-
--**Instant Frontend Update:** Streamlit Cloud detects the data modification on GitHub, clears its internal memory cache, and serves the latest property figures to users instantly.
+* **Automated Trigger:** A scheduled cron job workflow runs automatically every week.
+* **API Extraction:** Connects directly to the `data.gov.sg` CKAN API to pull fresh monthly HDB transaction records.
+* **Storage Optimization:** The raw data is saved into the data/ folder as a compressed Parquet file (shrinking the file footprint from over 21MB down to under 5MB).
+* **Automated Commits:** The GitHub Bot automatically commits and pushes the updated data back into this repository.
+* **Instant Frontend Update:** Streamlit Cloud detects the data modification on GitHub, clears its internal memory cache, and serves the latest property figures to users instantly.
 
 ## 📂 Repository Structure
 
@@ -50,20 +46,22 @@ To keep the application fast and cost-effective, the pipeline splits data retrie
 
 The project relies on a clean, modern data engineering stack specified in requirements.txt:
 
-- requests: Handles communication and security handshakes with government REST APIs.
+* **requests: Handles communication and security handshakes with government REST APIs.
 
-- pandas: Serves as our virtual data engine for structured tables and cleaning.
+* **pandas: Serves as our virtual data engine for structured tables and cleaning.
 
-- pyarrow: The structural backbone required to compress and read Parquet files efficiently.
+* **pyarrow: The structural backbone required to compress and read Parquet files efficiently.
 
-- streamlit: Turns our backend data framework into an interactive web interface.
+* **streamlit: Turns the backend data framework into an interactive web interface.
 
 ## ⏱️ The Automation Clock (CRON Syntax Explained)
 
-The automated workflow inside .github/workflows/hdb_updater.yml is governed by a standard cloud timer expression:
-cron: '0 1 * * 5'
+- The automated workflow inside .github/workflows/hdb_updater.yml is governed by a standard cloud timer expression:
+cron: '30 1 * * 5'
 
-``` 0: Exact Minute (00) ```
+- Note on Pipeline Frequency: Although HDB resale transaction data is updated monthly, the GitHub Actions cron job is intentionally set to run weekly to demonstrate the automated data-polling architecture and scheduled workflow capabilities.
+
+``` 30: Exact Minute (30) ```
 
 ``` 1: Exact Hour (1:00 AM UTC, which maps perfectly to 9:00 AM Singapore Time because Singapore is 8 hours ahead of universal time). ```
 
