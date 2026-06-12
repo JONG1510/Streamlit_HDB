@@ -8,12 +8,18 @@ print(f"🟢 Rerun at: {datetime.now()}")
 
 DATA_PATH = "data/latest_hdb_resale_prices.parquet"
 
-#
+# 1. Load full paraquet data into memory first
 @st.cache_data
 def load_data(path):
     print(f"✨ Loading data at: {datetime.now()}")
     df = pd.read_parquet(path)
+    # 1.2 Keep a standard pandas datetime series for the comparison
     df["month"] = pd.to_datetime(df["month"])
+    # 1.3 Truncate memory footprint to only keep rows from Jan 1, 2021 to current 
+    # IMPT remember to change #4.1 for calendar boundaries
+    start_cutoff = pd.to_datetime("2021-01-01")
+    df = df[df["month"] >= start_cutoff]
+           
     return df
 
 df = load_data(DATA_PATH)
@@ -81,10 +87,18 @@ filtered_df = filtered_df[
     filtered_df["resale_price"].between(price_range[0], price_range[1])
 ]
 
-# 4. Date range picking (calculated safely using clean dates)
+# 4.1 Date range picking (calculated safely using clean dates)
+# 4.2 FORCED DATE BOUNDARIES (Strictly 2017 to 2027)
+calendar_min = pd.to_datetime("2021-01-01").date()
+calendar_max = pd.to_datetime("2027-12-31").date()
+
 date_min = df["month"].min()
 date_max = df["month"].max()
-date_range = st.sidebar.date_input("Month Range", value=(date_min, date_max))
+date_range = st.sidebar.date_input(
+    "Month Range", 
+    value=(date_min, date_max),
+    min_value=calendar_min, 
+    max_value=calendar_max)
 
 # FIX 2: This will now run perfectly because filtered_df inherits the clean dates from step 1
 if len(date_range) == 2:
