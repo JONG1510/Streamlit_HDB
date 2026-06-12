@@ -6,26 +6,47 @@ from datetime import datetime
 # A simple way to see when the app was last rerun, which can be helpful for debugging and performance monitoring.
 print(f"🟢 Rerun at: {datetime.now()}")
 
-DATA_PATH = "data/resale_data.csv"
+DATA_PATH = "data/latest_hdb_resale_prices.parquet"
 
 #
 @st.cache_data
 def load_data(path):
     print(f"✨ Loading data at: {datetime.now()}")
-    df = pd.read_csv(path)
+    df = pd.read_parquet(path)
     df["month"] = pd.to_datetime(df["month"])
     return df
 
 df = load_data(DATA_PATH)
 
-df=pd.read_csv(DATA_PATH)
+### Phase 2: Setting up the Page and Main Canvas
+##This layout section sets the structural boundaries of the browser page before any data visuals are rendered.
 
-st.set_page_config(page_title="HDB Resale Dashboard", layout="wide")
+st.set_page_config(
+    page_title="HDB Resale Dashboard",
+    page_icon="🏢",
+    layout="wide",
+    initial_sidebar_state="auto",
+    )
+
+#===Helps create 2 columns ==== 
+# Create two columns: wide left column for title, narrow right column for a metric/logo
+#col1, col2 = st.columns([2, 1])
+
+#with col1:
+ #   st.title("Singapore HDB Resale Dashboard")
+ #   st.caption("Code-along: building a usable dashboard from real resale transactions.")
+
+#with col2:
+  # Adds a subtle status badge or metric directly to the right of your title
+  #  st.metric(label="Data Currency", value="YTD 2026", delta="Live Updated")
+
+#===End: helps create 2 columns ==== 
 
 st.title("Singapore HDB Resale Dashboard")
-st.caption("Code-along: building a usable dashboard from real resale transactions.")
+st.caption("Building a usable dashboard from real resale transactions.")
 
-# SIDEBAR
+#Construction Phase 2: building the filters on the left side
+
 st.sidebar.header("Filters")
 
 unique_towns = sorted(df["town"].dropna().unique())
@@ -34,8 +55,31 @@ unique_flat_types = sorted(df["flat_type"].dropna().unique())
 selected_towns = st.sidebar.multiselect("Town", unique_towns, default=[])
 selected_flat_types = st.sidebar.multiselect("Flat Type", unique_flat_types, default=[])
 
-min_price = int(df["resale_price"].min())
-max_price = int(df["resale_price"].max())
+
+filtered_df = df.copy()
+
+# 3. DYNAMICALLY FILTER THE STREET LIST
+# If towns are selected, narrow down the source data before extracting unique streets
+if selected_towns:
+    streets_df = filtered_df[filtered_df["town"].isin(selected_towns)]
+else:
+    streets_df = filtered_df # If no town is selected, show all streets
+
+## == original code for unique town and flat
+if selected_towns:
+    filtered_df = filtered_df[filtered_df["town"].isin(selected_towns)]
+
+if selected_flat_types:
+    filtered_df = filtered_df[filtered_df["flat_type"].isin(selected_flat_types)]
+
+unique_street = sorted(filtered_df["street_name"].dropna().unique())
+selected_street = st.sidebar.multiselect("Street Name", unique_street, default=[])
+
+if selected_street:
+    filtered_df = filtered_df[filtered_df["street_name"].isin(selected_street)]
+
+min_price = int(filtered_df["resale_price"].min())
+max_price = int(filtered_df["resale_price"].max())
 price_range = st.sidebar.slider(
     "Resale Price Range",
     min_value=min_price,
@@ -43,24 +87,16 @@ price_range = st.sidebar.slider(
     value=(min_price, max_price),
     step=10000,
 )
+
+filtered_df = filtered_df[
+df["resale_price"].between(price_range[0], price_range[1])
+]
 # JONG: Convert the 'month' column to datetime objects
-df["month"] = pd.to_datetime(df["month"])
+df["month"] = pd.to_datetime(df["month"]).dt.date
 
 date_min = df["month"].min().date()
 date_max = df["month"].max().date()
 date_range = st.sidebar.date_input("Month Range", value=(date_min, date_max))
-
-filtered_df = df.copy()
-
-if selected_towns:
-    filtered_df = filtered_df[filtered_df["town"].isin(selected_towns)]
-
-if selected_flat_types:
-    filtered_df = filtered_df[filtered_df["flat_type"].isin(selected_flat_types)]
-
-filtered_df = filtered_df[
-    filtered_df["resale_price"].between(price_range[0], price_range[1])
-]
 
 if len(date_range) == 2:
     start_date, end_date = date_range

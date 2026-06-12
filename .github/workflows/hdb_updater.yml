@@ -1,9 +1,9 @@
 name: Weekly HDB Data Auto-Update
 
-# 1. This sets the CRON clock to run every Friday at 9:00 AM Singapore Time (1:00 AM UTC)
+# 1. This sets the CRON clock to run every Friday at 9:33 AM Singapore Time (1:00 AM UTC)
 on:
   schedule:
-    - cron: '0 1 * * 5'
+    - cron: '33 1 * * 5'
   workflow_dispatch: # This adds a manual "Run Now" button inside GitHub just in case
 
 jobs:
